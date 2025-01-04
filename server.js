@@ -1,30 +1,25 @@
-// server.js
+import express, { json } from 'express';
+import { config } from 'dotenv';
+import taskRoutes from './routes/taskRoutes.js';
+import authRoutes from './routes/authRoutes.js';
+import connectDB from './config/db.js';  // Import database connection function
 
-const express = require('express');
-const mongoose = require('mongoose');
-const dotenv = require('dotenv');
-const taskRoutes = require('./routes/taskRoutes');
-const authRoutes = require('./routes/authRoutes');
-dotenv.config();
+config();  // Load environment variables
 
 const app = express();
 
 // Middleware
-app.use(express.json());
+app.use(json());
 
 // Routes
 app.use('/api/tasks', taskRoutes);
-app.use('/api/auth', authRoutes);  // New authentication routes
+app.use('/api/auth', authRoutes);  // Authentication routes
 
 // Connect to MongoDB
-mongoose.connect(process.env.MONGO_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-})
-  .then(() => console.log('MongoDB connected successfully'))
-  .catch((err) => console.log('MongoDB connection error: ', err));
+connectDB();  // Use the connection logic from config/db.js
 
 // Start the server
-app.listen(5000, () => {
-  console.log('Server is running on port 5000');
+const PORT = process.env.PORT || 5000;  // Use environment port or default to 5000
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
 });

@@ -1,6 +1,5 @@
 // auth/jwt.js
-
-const jwt = require('jsonwebtoken');
+import jwt from 'jsonwebtoken';
 
 // Generate JWT token
 const generateToken = (userId) => {
@@ -12,4 +11,4 @@ const verifyToken = (token) => {
   return jwt.verify(token, process.env.JWT_SECRET);
 };
 
-module.exports = { generateToken, verifyToken };
+export default { generateToken, verifyToken };

@@ -1,6 +1,6 @@
-const mongoose = require('mongoose');
+import { Schema, model } from 'mongoose';
 
-const TaskSchema = new mongoose.Schema({
+const TaskSchema = new Schema({
   title: {
     type: String,
     required: [true, 'Task title is required'],
@@ -18,4 +18,4 @@ const TaskSchema = new mongoose.Schema({
   timestamps: true, // Automatically manage createdAt and updatedAt fields
 });
 
-module.exports = mongoose.model('Task', TaskSchema);
+export default model('Task', TaskSchema);

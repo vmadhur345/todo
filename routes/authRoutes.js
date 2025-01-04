@@ -1,11 +1,12 @@
 // routes/authRoutes.js
 
-const express = require('express');
-const bcrypt = require('bcryptjs');
-const User = require('../models/User');
-const { generateToken } = require('../auth/jwt');
-const protect = require('../auth/authMiddleware');
-const router = express.Router();
+import jwt from '../auth/jwt.js'; // Import token generation function
+import protect from '../auth/authMiddleware.js';  // Import the protect middleware
+import bcrypt from 'bcryptjs';  // Import bcryptjs for password hashing
+import { Router } from 'express';
+import User from '../models/User.js';
+
+const router = Router();
 
 // Register a new user
 router.post('/register', async (req, res) => {
@@ -18,12 +19,16 @@ router.post('/register', async (req, res) => {
       return res.status(400).json({ error: 'User already exists' });
     }
 
+    // Hash the password before saving the user
+    const salt = await bcrypt.genSalt(10);  // Generate salt
+    const hashedPassword = await bcrypt.hash(password, salt);  // Hash the password
+
     // Create a new user
-    const user = new User({ username, email, password });
+    const user = new User({ username, email, password: hashedPassword });
     await user.save();
 
     // Generate JWT token
-    const token = generateToken(user._id);
+    const token = jwt.generateToken(user._id);  // Use jwt.generateToken instead of generateToken directly
 
     res.status(201).json({ message: 'User registered successfully', token });
   } catch (error) {
@@ -42,14 +47,14 @@ router.post('/login', async (req, res) => {
       return res.status(400).json({ error: 'Invalid credentials' });
     }
 
-    // Compare password
-    const isMatch = await user.matchPassword(password);
+    // Compare the provided password with the hashed password in the database
+    const isMatch = await bcrypt.compare(password, user.password);  // Use bcrypt to compare the password
     if (!isMatch) {
       return res.status(400).json({ error: 'Invalid credentials' });
     }
 
     // Generate JWT token
-    const token = generateToken(user._id);
+    const token = jwt.generateToken(user._id);  // Use jwt.generateToken instead of generateToken directly
 
     res.status(200).json({ message: 'Login successful', token });
   } catch (error) {
@@ -57,4 +62,9 @@ router.post('/login', async (req, res) => {
   }
 });
 
-module.exports = router;
+// Example of a protected route (using protect middleware)
+router.get('/protected', protect, (req, res) => {
+  res.status(200).json({ message: 'This is a protected route', user: req.user });
+});
+
+export default router;
