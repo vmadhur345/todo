@@ -15,7 +15,7 @@ const TaskSchema = new Schema({
     default: 'pending',
   },
 }, {
-  timestamps: true, // Automatically manage createdAt and updatedAt fields
+  timestamps: true, 
 });
 
 export default model('Task', TaskSchema);

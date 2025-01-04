@@ -1,4 +1,4 @@
-// auth/jwt.js
+
 import jwt from 'jsonwebtoken';
 
 // Generate JWT token
